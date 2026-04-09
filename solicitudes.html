@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitudes</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+
+    /* ════════════════════════════════
+       PÁGINA PÚBLICA
+    ════════════════════════════════ */
+    #vista-publica { min-height: 100vh; display: flex; flex-direction: column; }
+
+    .pub-hero {
+      background: #1a1a1a; color: #fff;
+      padding: 3rem 1.5rem 2.5rem;
+      text-align: center;
+      position: relative;
+    }
+    .pub-hero h1 { font-size: 28px; font-weight: 500; margin-bottom: 8px; }
+    .pub-hero p  { font-size: 15px; color: #aaa; max-width: 480px; margin: 0 auto; }
+
+    /* Trigger oculto — esquina inferior derecha del hero */
+    .secret-trigger {
+      position: absolute; bottom: 12px; right: 16px;
+      width: 28px; height: 28px; cursor: pointer; opacity: 0;
+    }
+
+    .pub-body {
+      flex: 1; display: flex; align-items: flex-start;
+      justify-content: center; padding: 2.5rem 1rem;
+    }
+    .pub-card {
+      background: #fff; border: 1px solid #e0ddd5; border-radius: 16px;
+      padding: 2rem; width: 100%; max-width: 520px;
+    }
+    .pub-card h2 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
+    .pub-card > p { font-size: 13px; color: #888; margin-bottom: 1.75rem; }
+
+    .field { margin-bottom: 1.1rem; }
+    label  { display: block; font-size: 13px; color: #666; margin-bottom: 4px; }
+    input, textarea, select {
+      width: 100%; padding: 10px 12px; font-size: 14px;
+      border: 1px solid #d0cdc5; border-radius: 8px;
+      background: #fff; color: #1a1a1a; font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #888; }
+    textarea { resize: vertical; min-height: 90px; }
+
+    .btn {
+      padding: 10px 20px; font-size: 14px; border: 1px solid #d0cdc5;
+      border-radius: 8px; cursor: pointer; background: #fff;
+      color: #1a1a1a; font-family: inherit; transition: all 0.15s;
+    }
+    .btn:hover { background: #f5f5f3; }
+    .btn.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .btn.primary:hover { opacity: 0.85; }
+    .btn.danger  { background: #fcebeb; color: #a32d2d; border-color: #f7c1c1; }
+    .btn.danger:hover { background: #f7c1c1; }
+    .btn.sm { padding: 5px 12px; font-size: 12px; }
+    .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 1rem; }
+    .alert.success { background: #eaf3de; color: #3b6d11; border: 1px solid #c0dd97; }
+    .alert.error   { background: #fcebeb; color: #a32d2d; border: 1px solid #f7c1c1; }
+    .alert.info    { background: #e6f1fb; color: #185fa5; border: 1px solid #b5d4f4; }
+    .alert.warning { background: #faeeda; color: #854f0b; border: 1px solid #fac775; }
+
+    /* SUCCESS STATE */
+    .success-state { text-align: center; padding: 2rem 1rem; display: none; }
+    .success-state .check { font-size: 48px; margin-bottom: 12px; }
+    .success-state h3 { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+    .success-state p  { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
+
+    /* ════════════════════════════════
+       MODAL LOGIN OCULTO
+    ════════════════════════════════ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 100;
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: #fff; border-radius: 16px; padding: 2rem;
+      width: 100%; max-width: 360px; position: relative;
+      animation: fadeUp 0.2s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-card h2 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
+    .modal-card > p { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+    .modal-close {
+      position: absolute; top: 14px; right: 16px;
+      font-size: 18px; cursor: pointer; color: #aaa;
+      background: none; border: none; line-height: 1;
+    }
+    .modal-close:hover { color: #333; }
+
+    /* ════════════════════════════════
+       SHELL ADMIN / SUPERADMIN
+    ════════════════════════════════ */
+    #vista-admin { display: none; flex-direction: column; min-height: 100vh; }
+    #vista-admin.active { display: flex; }
+
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem; height: 52px; background: #fff;
+      border-bottom: 1px solid #e0ddd5; position: sticky; top: 0; z-index: 10;
+    }
+    .topbar-brand { font-size: 15px; font-weight: 500; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .user-chip { font-size: 13px; color: #666; }
+
+    .main { display: flex; flex: 1; }
+    .sidebar {
+      width: 200px; background: #fff; border-right: 1px solid #e0ddd5;
+      padding: 1rem 0; flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px; padding: 9px 1.25rem;
+      font-size: 14px; color: #666; cursor: pointer;
+      border-left: 2px solid transparent; transition: all 0.15s; user-select: none;
+    }
+    .nav-item:hover { background: #f5f5f3; color: #1a1a1a; }
+    .nav-item.active { color: #1a1a1a; background: #f5f5f3;
+                       border-left-color: #1a1a1a; font-weight: 500; }
+    .nav-icon { width: 18px; text-align: center; font-size: 15px; }
+
+    .content { flex: 1; padding: 2rem; overflow-y: auto; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-title { font-size: 18px; font-weight: 500; margin-bottom: 1.5rem; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+    .stat { background: #fff; border: 1px solid #e0ddd5; border-radius: 12px; padding: 1rem 1.25rem; }
+    .stat-num   { font-size: 28px; font-weight: 500; }
+    .stat-label { font-size: 12px; color: #888; margin-top: 2px; }
+
+    /* Filtros */
+    .toolbar { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 5px 12px; font-size: 12px; border: 1px solid #d0cdc5;
+      border-radius: 99px; cursor: pointer; background: #fff;
+      color: #888; font-family: inherit; transition: all 0.15s;
+    }
+    .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+    /* Tarjetas solicitud */
+    .sol-card {
+      background: #fff; border: 1px solid #e0ddd5;
+      border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 10px;
+    }
+    .sol-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .sol-title  { font-size: 14px; font-weight: 500; }
+    .sol-meta   { font-size: 12px; color: #888; margin-top: 3px; }
+    .sol-desc   { font-size: 13px; color: #555; margin-top: 10px;
+                  border-top: 1px solid #f0ede5; padding-top: 8px; }
+    .sol-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .sol-select {
+      font-size: 12px; padding: 4px 8px; border-radius: 6px;
+      border: 1px solid #d0cdc5; background: #fff; color: #1a1a1a; font-family: inherit;
+    }
+    .badge { display: inline-block; font-size: 11px; padding: 2px 9px; border-radius: 99px; font-weight: 500; }
+    .badge.pendiente  { background: #faeeda; color: #854f0b; }
+    .badge.en-proceso { background: #e6f1fb; color: #185fa5; }
+    .badge.resuelto   { background: #eaf3de; color: #3b6d11; }
+    .badge.super { background: #EEEDFE; color: #534AB7; }
+    .badge.admin { background: #E6F1FB; color: #185FA5; }
+    .assigned-tag {
+      font-size: 11px; color: #185fa5; background: #e6f1fb;
+      padding: 2px 8px; border-radius: 99px; white-space: nowrap;
+    }
+    .no-assigned { font-size: 11px; color: #aaa; }
+    .empty { text-align: center; padding: 3rem 1rem; color: #aaa; font-size: 14px; }
+
+    /* Tabla usuarios */
+    .user-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .user-table th { text-align: left; font-size: 12px; color: #888; font-weight: 500;
+                     padding: 8px 12px; border-bottom: 1px solid #e0ddd5; }
+    .user-table td { padding: 10px 12px; border-bottom: 1px solid #f0ede5; vertical-align: middle; }
+    .user-table tr:last-child td { border-bottom: none; }
+    .add-user-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; align-items: end; }
+
+    /* Config WA */
+    .config-box { background: #f5f5f3; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
+    .config-box h3 { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+    .step { display: flex; gap: 10px; margin-bottom: 10px; font-size: 13px;
+            color: #555; align-items: flex-start; }
+    .step-num { min-width: 22px; height: 22px; border-radius: 50%; background: #fff;
+                border: 1px solid #d0cdc5; display: flex; align-items: center;
+                justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+    code { background: #fff; border: 1px solid #d0cdc5; padding: 1px 6px;
+           border-radius: 4px; font-family: monospace; font-size: 12px; }
+    hr.div { border: none; border-top: 1px solid #e0ddd5; margin: 1.5rem 0; }
+    a { color: #185fa5; }
+
+    @media(max-width:580px) {
+      .sidebar { display: none; }
+      .content { padding: 1rem; }
+      .add-user-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     VISTA PÚBLICA
+══════════════════════════════════════════════════════════ -->
+<div id="vista-publica">
+  <div class="pub-hero">
+    <h1>¿En qué te podemos ayudar?</h1>
+    <p>Envía tu solicitud y te responderemos a la brevedad.</p>
+    <!-- Trigger oculto: 3 clics en la esquina para abrir login -->
+    <div class="secret-trigger" id="secret-trigger" onclick="secretClick()"></div>
+  </div>
+
+  <div class="pub-body">
+    <div class="pub-card">
+      <!-- Formulario -->
+      <div id="form-publico">
+        <h2>Nueva solicitud</h2>
+        <p>No necesitas registrarte. Solo completa el formulario.</p>
+        <div id="alert-pub"></div>
+        <div class="field">
+          <label>Tu nombre</label>
+          <input type="text" id="pub-nombre" placeholder="Ej: María González">
+        </div>
+        <div class="field">
+          <label>Tipo de solicitud</label>
+          <select id="pub-tipo">
+            <option value="">Selecciona...</option>
+            <option>Soporte técnico</option>
+            <option>Materiales / insumos</option>
+            <option>Permiso / Movilizacion</option>
+            <option>Consultar Orden de compra</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Descripción</label>
+          <textarea id="pub-desc" placeholder="Describe lo que necesitas..."></textarea>
+        </div>
+        <div class="field">
+          <label>Prioridad</label>
+          <select id="pub-prio">
+            <option value="Normal">Normal</option>
+            <option value="Alta">Alta</option>
+            <option value="Urgente">Urgente</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" style="width:100%" onclick="enviarPublica()">Enviar solicitud →</button>
+        </div>
+      </div>
+
+      <!-- Éxito -->
+      <div class="success-state" id="exito-pub">
+        <div class="check">✅</div>
+        <h3>¡Solicitud enviada!</h3>
+        <p>Recibimos tu solicitud y la estamos revisando. Gracias.</p>
+        <button class="btn primary" onclick="resetForm()">Enviar otra solicitud</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL LOGIN (oculto)
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal-card">
+    <button class="modal-close" onclick="cerrarModal()">✕</button>
+    <h2>Acceso interno</h2>
+    <p>Solo para administradores del sistema.</p>
+    <div id="alert-modal"></div>
+    <div class="field">
+      <label>Usuario</label>
+      <input type="text" id="m-user" placeholder="usuario" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="m-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="btn-row" style="margin-top:1.25rem">
+      <button class="btn" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn primary" onclick="iniciarSesion()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     VISTA ADMIN / SUPERADMIN
+══════════════════════════════════════════════════════════ -->
+<div id="vista-admin">
+  <div class="topbar">
+    <div class="topbar-brand">Sistema de Solicitudes</div>
+    <div class="topbar-right">
+      <span class="user-chip" id="topbar-user"></span>
+      <span class="badge" id="topbar-role"></span>
+      <button class="btn sm" onclick="cerrarSesion()">Salir</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="content">
+
+      <!-- SUPERADMIN: Dashboard -->
+      <div class="page" id="page-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="stats" id="stats-dash"></div>
+        <div class="toolbar" id="tb-dash">
+          <button class="filter-btn active" onclick="filtrarDash('todos',this)">Todas</button>
+          <button class="filter-btn" onclick="filtrarDash('Pendiente',this)">Pendientes</button>
+          <button class="filter-btn" onclick="filtrarDash('En proceso',this)">En proceso</button>
+          <button class="filter-btn" onclick="filtrarDash('Resuelto',this)">Resueltas</button>
+        </div>
+        <div id="lista-dash"></div>
+      </div>
+
+      <!-- SUPERADMIN: Usuarios -->
+      <div class="page" id="page-usuarios">
+        <div class="page-title">Gestión de usuarios</div>
+        <div class="config-box">
+          <h3>Agregar usuario</h3>
+          <div class="add-user-row">
+            <div class="field" style="margin:0"><label>Usuario</label><input type="text" id="nu-user" placeholder="nombre"></div>
+            <div class="field" style="margin:0"><label>Contraseña</label><input type="password" id="nu-pass" placeholder="••••••"></div>
+            <div class="field" style="margin:0"><label>Rol</label>
+              <select id="nu-rol">
+                <option value="admin">Admin</option>
+                <option value="superadmin">Superadmin</option>
+              </select></div>
+            <button class="btn primary" style="align-self:end" onclick="agregarUsuario()">Agregar</button>
+          </div>
+          <div id="alert-usr" style="margin-top:0.75rem"></div>
+        </div>
+        <table class="user-table">
+          <thead><tr><th>Usuario</th><th>Rol</th><th>Asignaciones</th><th></th></tr></thead>
+          <tbody id="tbody-usr"></tbody>
+        </table>
+      </div>
+
+      <!-- ADMIN: Mis asignaciones -->
+      <div class="page" id="page-asignadas">
+        <div class="page-title">Solicitudes asignadas a mí</div>
+        <div class="toolbar" id="tb-asig">
+          <button class="filter-btn active" onclick="filtrarAsig('todos',this)">Todas</button>
+          <button class="filter-btn" onclick="filtrarAsig('Pendiente',this)">Pendientes</button>
+          <button class="filter-btn" onclick="filtrarAsig('En proceso',this)">En proceso</button>
+          <button class="filter-btn" onclick="filtrarAsig('Resuelto',this)">Resueltas</button>
+        </div>
+        <div id="lista-asig"></div>
+      </div>
+
+      <!-- SUPERADMIN: WhatsApp -->
+      <div class="page" id="page-wa">
+        <div class="page-title">Configurar WhatsApp</div>
+        <div class="config-box">
+          <h3>Cómo activar CallMeBot (solo una vez)</h3>
+          <div class="step"><div class="step-num">1</div>
+            <span>Agrega <code>+34 644 59 21 68</code> a tus contactos de WhatsApp</span></div>
+          <div class="step"><div class="step-num">2</div>
+            <span>Mándale este mensaje exacto: <code>I allow callmebot to send me messages</code></span></div>
+          <div class="step"><div class="step-num">3</div>
+            <span>El bot te responde con tu <strong>API key</strong></span></div>
+          <div class="step"><div class="step-num">4</div>
+            <span>Pega tu número y API key abajo y guarda</span></div>
+        </div>
+        <div class="field"><label>Número (con código de país, sin + ni espacios)</label>
+          <input type="text" id="wa-phone" placeholder="56912345678"></div>
+        <div class="field"><label>API Key de CallMeBot</label>
+          <input type="text" id="wa-apikey" placeholder="123456"></div>
+        <div id="alert-wa"></div>
+        <div class="btn-row">
+          <button class="btn" onclick="probarWA()">Enviar prueba</button>
+          <button class="btn primary" onclick="guardarWA()">Guardar</button>
+        </div>
+        <hr class="div">
+        <p style="font-size:12px;color:#aaa">Servicio gratuito · <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank">callmebot.com</a></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  STORAGE
+// ════════════════════════════════════════════════════════════
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+function getUsuarios()    { return S.get('usuarios')    || []; }
+function getSolicitudes() { return S.get('solicitudes') || []; }
+function getWA()          { return S.get('wa_config')   || {phone:'',apikey:''}; }
+
+function initUsuarios() {
+  if (!S.get('usuarios')) {
+    S.set('usuarios', [
+      {id:1, username:'superadmin', password:'super123', rol:'superadmin'},
+      {id:2, username:'admin1',     password:'admin123', rol:'admin'},
+      {id:3, username:'admin2',     password:'admin456', rol:'admin'},
+    ]);
+  }
+}
+
+let sesion = null;
+let filtDash = 'todos';
+let filtAsig = 'todos';
+
+// ════════════════════════════════════════════════════════════
+//  TRIGGER OCULTO (3 clics en la esquina)
+// ════════════════════════════════════════════════════════════
+let secretCount = 0, secretTimer = null;
+function secretClick() {
+  secretCount++;
+  clearTimeout(secretTimer);
+  secretTimer = setTimeout(() => secretCount = 0, 1500);
+  if (secretCount >= 3) {
+    secretCount = 0;
+    abrirModal();
+  }
+}
+
+function abrirModal() {
+  document.getElementById('modal-login').classList.add('active');
+  document.getElementById('m-user').focus();
+}
+function cerrarModal() {
+  document.getElementById('modal-login').classList.remove('active');
+  document.getElementById('alert-modal').innerHTML = '';
+  document.getElementById('m-user').value = '';
+  document.getElementById('m-pass').value = '';
+}
+document.getElementById('m-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') iniciarSesion();
+});
+
+// ════════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════════
+function iniciarSesion() {
+  const username = document.getElementById('m-user').value.trim();
+  const password = document.getElementById('m-pass').value;
+  const box      = document.getElementById('alert-modal');
+  const u = getUsuarios().find(u => u.username === username && u.password === password);
+  if (!u) {
+    box.innerHTML = '<div class="alert error">Usuario o contraseña incorrectos.</div>';
+    return;
+  }
+  sesion = u;
+  cerrarModal();
+  document.getElementById('vista-publica').style.display  = 'none';
+  document.getElementById('vista-admin').classList.add('active');
+  cargarAdmin();
+}
+
+function cerrarSesion() {
+  sesion = null;
+  document.getElementById('vista-admin').classList.remove('active');
+  document.getElementById('vista-publica').style.display = 'flex';
+  // limpiar filtros
+  filtDash = 'todos'; filtAsig = 'todos';
+}
+
+// ════════════════════════════════════════════════════════════
+//  SHELL ADMIN
+// ════════════════════════════════════════════════════════════
+function cargarAdmin() {
+  const rb = document.getElementById('topbar-role');
+  document.getElementById('topbar-user').textContent = sesion.username;
+  rb.textContent = sesion.rol;
+  rb.className = `badge ${sesion.rol === 'superadmin' ? 'super' : 'admin'}`;
+
+  const nav = sesion.rol === 'superadmin'
+    ? [{id:'dashboard',icon:'📊',label:'Dashboard'},
+       {id:'usuarios', icon:'👥',label:'Usuarios'},
+       {id:'wa',       icon:'💬',label:'WhatsApp'}]
+    : [{id:'asignadas',icon:'📬',label:'Mis asignaciones'}];
+
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = nav.map((n,i) =>
+    `<div class="nav-item ${i===0?'active':''}" onclick="irA('${n.id}',this)">
+       <span class="nav-icon">${n.icon}</span>${n.label}
+     </div>`).join('');
+
+  // restaurar WA
+  const wa = getWA();
+  const wp = document.getElementById('wa-phone');
+  const wk = document.getElementById('wa-apikey');
+  if (wp) wp.value = wa.phone   || '';
+  if (wk) wk.value = wa.apikey || '';
+
+  irA(nav[0].id, sb.querySelector('.nav-item'));
+}
+
+function irA(pageId, el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('page-' + pageId)?.classList.add('active');
+  if (pageId === 'dashboard') renderDashboard();
+  if (pageId === 'usuarios')  renderUsuarios();
+  if (pageId === 'asignadas') renderAsignadas();
+}
+
+// ════════════════════════════════════════════════════════════
+//  FORMULARIO PÚBLICO
+// ════════════════════════════════════════════════════════════
+async function enviarPublica() {
+  const nombre = document.getElementById('pub-nombre').value.trim();
+  const tipo   = document.getElementById('pub-tipo').value;
+  const desc   = document.getElementById('pub-desc').value.trim();
+  const prio   = document.getElementById('pub-prio').value;
+  const box    = document.getElementById('alert-pub');
+
+  if (!nombre || !tipo || !desc) {
+    box.innerHTML = '<div class="alert error">Por favor completa todos los campos.</div>';
+    return;
+  }
+
+  const sols = getSolicitudes();
+  const sol = {
+    id:          Date.now(),
+    nombre, tipo, descripcion: desc, prioridad: prio,
+    solicitante: nombre,
+    asignadoA:   null,
+    estado:      'Pendiente',
+    fecha:       new Date().toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'})
+  };
+  sols.unshift(sol);
+  S.set('solicitudes', sols);
+
+  // notificar WA
+  await notificarWA(sol);
+
+  // mostrar éxito
+  document.getElementById('form-publico').style.display = 'none';
+  document.getElementById('exito-pub').style.display    = 'block';
+  box.innerHTML = '';
+}
+
+function resetForm() {
+  document.getElementById('form-publico').style.display = 'block';
+  document.getElementById('exito-pub').style.display    = 'none';
+  document.getElementById('pub-nombre').value = '';
+  document.getElementById('pub-tipo').value   = '';
+  document.getElementById('pub-desc').value   = '';
+  document.getElementById('pub-prio').value   = 'Normal';
+}
+
+// ════════════════════════════════════════════════════════════
+//  DASHBOARD (SUPERADMIN)
+// ════════════════════════════════════════════════════════════
+function filtrarDash(f, btn) {
+  filtDash = f;
+  document.querySelectorAll('#tb-dash .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashboard();
+}
+
+function renderDashboard() {
+  const sols = getSolicitudes();
+  document.getElementById('stats-dash').innerHTML = `
+    <div class="stat"><div class="stat-num">${sols.length}</div><div class="stat-label">Total</div></div>
+    <div class="stat"><div class="stat-num">${sols.filter(s=>s.estado==='Pendiente').length}</div><div class="stat-label">Pendientes</div></div>
+    <div class="stat"><div class="stat-num">${sols.filter(s=>s.estado==='En proceso').length}</div><div class="stat-label">En proceso</div></div>
+    <div class="stat"><div class="stat-num">${sols.filter(s=>s.estado==='Resuelto').length}</div><div class="stat-label">Resueltas</div></div>`;
+
+  let items = filtDash === 'todos' ? sols : sols.filter(s => s.estado === filtDash);
+  const cont = document.getElementById('lista-dash');
+  if (!items.length) { cont.innerHTML = '<div class="empty">No hay solicitudes.</div>'; return; }
+  cont.innerHTML = items.map(s => tarjeta(s, 'superadmin')).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+//  ASIGNADAS (ADMIN)
+// ════════════════════════════════════════════════════════════
+function filtrarAsig(f, btn) {
+  filtAsig = f;
+  document.querySelectorAll('#tb-asig .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAsignadas();
+}
+
+function renderAsignadas() {
+  let items = getSolicitudes().filter(s => s.asignadoA === sesion.username);
+  if (filtAsig !== 'todos') items = items.filter(s => s.estado === filtAsig);
+  const cont = document.getElementById('lista-asig');
+  if (!items.length) { cont.innerHTML = '<div class="empty">No tienes solicitudes asignadas.</div>'; return; }
+  cont.innerHTML = items.map(s => tarjeta(s, 'admin')).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+//  TARJETA SOLICITUD
+// ════════════════════════════════════════════════════════════
+function tarjeta(s, rol) {
+  const cls = s.estado === 'Pendiente' ? 'pendiente' : s.estado === 'En proceso' ? 'en-proceso' : 'resuelto';
+  const admins = getUsuarios().filter(u => u.rol === 'admin');
+  const asigTag = s.asignadoA
+    ? `<span class="assigned-tag">→ ${s.asignadoA}</span>`
+    : `<span class="no-assigned">Sin asignar</span>`;
+
+  let actions = `<span class="badge ${cls}">${s.estado}</span>`;
+
+  // estado editable para ambos roles
+  actions += `<select class="sol-select" onchange="cambiarEstado(${s.id},this.value)">
+    <option ${s.estado==='Pendiente' ?'selected':''}>Pendiente</option>
+    <option ${s.estado==='En proceso'?'selected':''}>En proceso</option>
+    <option ${s.estado==='Resuelto'  ?'selected':''}>Resuelto</option>
+  </select>`;
+
+  // asignar solo superadmin
+  if (rol === 'superadmin') {
+    actions += `<select class="sol-select" onchange="asignar(${s.id},this.value)">
+      <option value="">Sin asignar</option>
+      ${admins.map(a=>`<option ${s.asignadoA===a.username?'selected':''}>${a.username}</option>`).join('')}
+    </select>`;
+  }
+
+  return `<div class="sol-card">
+    <div class="sol-header">
+      <div>
+        <div class="sol-title">${s.tipo} <span style="font-weight:400;color:#888">— ${s.solicitante}</span></div>
+        <div class="sol-meta">${s.fecha} · Prioridad: ${s.prioridad} · ${asigTag}</div>
+      </div>
+      <div class="sol-actions">${actions}</div>
+    </div>
+    <div class="sol-desc">${s.descripcion}</div>
+  </div>`;
+}
+
+function cambiarEstado(id, estado) {
+  const sols = getSolicitudes();
+  const s = sols.find(x => x.id === id);
+  if (s) { s.estado = estado; S.set('solicitudes', sols); }
+  if (sesion?.rol === 'superadmin') renderDashboard();
+  else renderAsignadas();
+}
+
+function asignar(id, admin) {
+  const sols = getSolicitudes();
+  const s = sols.find(x => x.id === id);
+  if (s) { s.asignadoA = admin || null; S.set('solicitudes', sols); }
+  renderDashboard();
+}
+
+// ════════════════════════════════════════════════════════════
+//  USUARIOS (SUPERADMIN)
+// ════════════════════════════════════════════════════════════
+function renderUsuarios() {
+  const tbody = document.getElementById('tbody-usr');
+  const sols  = getSolicitudes();
+  tbody.innerHTML = getUsuarios().map(u => {
+    const asig = sols.filter(s => s.asignadoA === u.username).length;
+    const esProtegido = u.username === 'superadmin';
+    return `<tr>
+      <td>${u.username}</td>
+      <td><span class="badge ${u.rol === 'superadmin' ? 'super' : 'admin'}">${u.rol}</span></td>
+      <td>${u.rol === 'admin' ? asig : '—'}</td>
+      <td>${esProtegido ? '' : `<button class="btn sm danger" onclick="eliminarUsuario(${u.id})">Eliminar</button>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+function agregarUsuario() {
+  const username = document.getElementById('nu-user').value.trim();
+  const password = document.getElementById('nu-pass').value.trim();
+  const rol      = document.getElementById('nu-rol').value;
+  const box      = document.getElementById('alert-usr');
+  if (!username || !password) {
+    box.innerHTML = '<div class="alert error">Completa usuario y contraseña.</div>'; return;
+  }
+  const usuarios = getUsuarios();
+  if (usuarios.find(u => u.username === username)) {
+    box.innerHTML = '<div class="alert error">Ese nombre ya existe.</div>'; return;
+  }
+  usuarios.push({id: Date.now(), username, password, rol});
+  S.set('usuarios', usuarios);
+  document.getElementById('nu-user').value = '';
+  document.getElementById('nu-pass').value = '';
+  box.innerHTML = '<div class="alert success">✓ Usuario creado.</div>';
+  setTimeout(() => box.innerHTML = '', 3000);
+  renderUsuarios();
+}
+
+function eliminarUsuario(id) {
+  if (!confirm('¿Eliminar este usuario?')) return;
+  S.set('usuarios', getUsuarios().filter(u => u.id !== id));
+  renderUsuarios();
+}
+
+// ════════════════════════════════════════════════════════════
+//  WHATSAPP
+// ════════════════════════════════════════════════════════════
+async function notificarWA(sol) {
+  const wa = getWA();
+  if (!wa.phone || !wa.apikey) return false;
+  const emoji = sol.prioridad === 'Urgente' ? '🔴' : sol.prioridad === 'Alta' ? '🟠' : '🟢';
+  const texto = `📋 Nueva solicitud\n👤 ${sol.nombre || sol.solicitante}\n📁 ${sol.tipo}\n${emoji} Prioridad: ${sol.prioridad}\n📝 ${sol.descripcion}\n🕐 ${sol.fecha}`;
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${wa.phone}&text=${encodeURIComponent(texto)}&apikey=${wa.apikey}`;
+  try { await fetch(url, {mode:'no-cors'}); return true; } catch(e) { return false; }
+}
+
+async function probarWA() {
+  const phone  = document.getElementById('wa-phone').value.trim();
+  const apikey = document.getElementById('wa-apikey').value.trim();
+  const box    = document.getElementById('alert-wa');
+  if (!phone || !apikey) { box.innerHTML = '<div class="alert error">Ingresa número y API key.</div>'; return; }
+  box.innerHTML = '<div class="alert info">Enviando mensaje de prueba...</div>';
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent('✅ Prueba exitosa desde tu sistema de solicitudes.')}&apikey=${apikey}`;
+  try {
+    await fetch(url, {mode:'no-cors'});
+    box.innerHTML = '<div class="alert success">✓ Enviado. Revisa tu WhatsApp.</div>';
+  } catch(e) {
+    box.innerHTML = '<div class="alert error">Error al conectar.</div>';
+  }
+}
+
+function guardarWA() {
+  S.set('wa_config', {
+    phone:  document.getElementById('wa-phone').value.trim(),
+    apikey: document.getElementById('wa-apikey').value.trim()
+  });
+  document.getElementById('alert-wa').innerHTML = '<div class="alert success">✓ Configuración guardada.</div>';
+  setTimeout(() => document.getElementById('alert-wa').innerHTML = '', 3000);
+}
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+initUsuarios();
+</script>
+</body>
+</html>

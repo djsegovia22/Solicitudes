@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1775654031919,
+    "nombre": "Javier segovia",
+    "tipo": "Soporte técnico",
+    "descripcion": "Quiero un correo",
+    "prioridad": "Urgente",
+    "estado": "Resuelto",
+    "fecha": "08/04/26 09:13"
+  },
+  {
+    "id": 1775652799008,
+    "nombre": "Rocio Cortes",
+    "tipo": "Permiso / ausencia",
+    "descripcion": "Bajada anticipada",
+    "prioridad": "Urgente",
+    "estado": "Pendiente",
+    "fecha": "08/04/26 08:53"
+  },
+  {
+    "id": 1775617527836,
+    "nombre": "Javier Segovia",
+    "tipo": "Permiso / ausencia",
+    "descripcion": "Permiso de bajada, tipo 15:00hrs",
+    "prioridad": "Alta",
+    "estado": "En proceso",
+    "fecha": "07/04/26 23:05"
+  },
+  {
+    "id": 1775617429125,
+    "nombre": "Javier Segovia Orellana",
+    "tipo": "Permiso / ausencia",
+    "descripcion": "Bajada anticipada",
+    "prioridad": "Normal",
+    "estado": "Resuelto",
+    "fecha": "07/04/26 23:03"
+  }
+]
