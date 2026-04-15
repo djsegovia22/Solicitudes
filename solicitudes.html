@@ -3,59 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solicitudes</title>
+  <title>Design Logistica — Solicitudes</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
            background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
 
-    /* ════════════════════════════════
-       PÁGINA PÚBLICA
-    ════════════════════════════════ */
+    /* ════════ PÚBLICA ════════ */
     #vista-publica { min-height: 100vh; display: flex; flex-direction: column; }
 
     .pub-hero {
-      background: #1a1a1a; color: #fff;
-      padding: 3rem 1.5rem 2.5rem;
-      text-align: center;
+      background: #1a1a1a;
+      padding: 1.75rem 1.5rem 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0;
       position: relative;
     }
-    .pub-hero h1 { font-size: 28px; font-weight: 500; margin-bottom: 8px; }
-    .pub-hero p  { font-size: 15px; color: #aaa; max-width: 480px; margin: 0 auto; }
+    .hero-brand { display: flex; align-items: center; gap: 16px; padding-bottom: 1.5rem; }
+    .hero-icon { height: 64px; border-radius: 6px; }
+    .hero-text { display: flex; flex-direction: column; }
+    .hero-title { color: #fff; font-size: 22px; font-weight: 700; letter-spacing: 1px; line-height: 1.1; }
+    .hero-sub { color: #F5A623; font-size: 13px; font-weight: 400; letter-spacing: 0.5px; margin-top: 3px; }
+    .hero-bar { width: 100%; height: 5px; background: #F5A623; }
+    .secret-trigger { position: absolute; bottom: 0; right: 0; width: 36px; height: 36px; cursor: pointer; }
 
-    /* Trigger oculto — esquina inferior derecha del hero */
-    .secret-trigger {
-      position: absolute; bottom: 12px; right: 16px;
-      width: 28px; height: 28px; cursor: pointer; opacity: 0;
-    }
+    .pub-body { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 2.5rem 1rem; }
+    .pub-card { background: #fff; border: 1px solid #e0ddd5; border-radius: 16px; padding: 2rem; width: 100%; max-width: 520px; }
 
-    .pub-body {
-      flex: 1; display: flex; align-items: flex-start;
-      justify-content: center; padding: 2.5rem 1rem;
-    }
-    .pub-card {
-      background: #fff; border: 1px solid #e0ddd5; border-radius: 16px;
-      padding: 2rem; width: 100%; max-width: 520px;
-    }
-    .pub-card h2 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
-    .pub-card > p { font-size: 13px; color: #888; margin-bottom: 1.75rem; }
+    .success-state { text-align: center; padding: 2rem 1rem; display: none; }
+    .success-state .check { font-size: 48px; margin-bottom: 12px; }
+    .success-state h3 { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+    .success-state p  { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
 
+    /* ════════ ELEMENTOS ════════ */
     .field { margin-bottom: 1.1rem; }
-    label  { display: block; font-size: 13px; color: #666; margin-bottom: 4px; }
+    label  { display: block; font-size: 13px; color: #666; margin-bottom: 4px; font-weight: 500; }
+    .req   { color: #c0392b; margin-left: 2px; }
     input, textarea, select {
       width: 100%; padding: 10px 12px; font-size: 14px;
       border: 1px solid #d0cdc5; border-radius: 8px;
-      background: #fff; color: #1a1a1a; font-family: inherit;
-      transition: border-color 0.15s;
+      background: #fff; color: #1a1a1a; font-family: inherit; transition: border-color 0.15s;
     }
-    input:focus, textarea:focus, select:focus { outline: none; border-color: #888; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #F5A623; }
+    input.error, select.error { border-color: #c0392b; }
     textarea { resize: vertical; min-height: 90px; }
-
-    .btn {
-      padding: 10px 20px; font-size: 14px; border: 1px solid #d0cdc5;
-      border-radius: 8px; cursor: pointer; background: #fff;
-      color: #1a1a1a; font-family: inherit; transition: all 0.15s;
-    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn { padding: 10px 20px; font-size: 14px; border: 1px solid #d0cdc5;
+           border-radius: 8px; cursor: pointer; background: #fff;
+           color: #1a1a1a; font-family: inherit; transition: all 0.15s; }
     .btn:hover { background: #f5f5f3; }
     .btn.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
     .btn.primary:hover { opacity: 0.85; }
@@ -63,190 +58,142 @@
     .btn.danger:hover { background: #f7c1c1; }
     .btn.sm { padding: 5px 12px; font-size: 12px; }
     .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
-
     .alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 1rem; }
     .alert.success { background: #eaf3de; color: #3b6d11; border: 1px solid #c0dd97; }
     .alert.error   { background: #fcebeb; color: #a32d2d; border: 1px solid #f7c1c1; }
     .alert.info    { background: #e6f1fb; color: #185fa5; border: 1px solid #b5d4f4; }
     .alert.warning { background: #faeeda; color: #854f0b; border: 1px solid #fac775; }
+    .err-msg { font-size: 12px; color: #c0392b; margin-top: 3px; display: none; }
+    .err-msg.show { display: block; }
 
-    /* SUCCESS STATE */
-    .success-state { text-align: center; padding: 2rem 1rem; display: none; }
-    .success-state .check { font-size: 48px; margin-bottom: 12px; }
-    .success-state h3 { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
-    .success-state p  { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
-
-    /* ════════════════════════════════
-       MODAL LOGIN OCULTO
-    ════════════════════════════════ */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45); z-index: 100;
-      align-items: center; justify-content: center; padding: 1rem;
-    }
+    /* ════════ MODAL ════════ */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+                     z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
     .modal-overlay.active { display: flex; }
-    .modal-card {
-      background: #fff; border-radius: 16px; padding: 2rem;
-      width: 100%; max-width: 360px; position: relative;
-      animation: fadeUp 0.2s ease;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    .modal-card { background: #fff; border-radius: 16px; padding: 2rem; width: 100%;
+                  max-width: 360px; position: relative; animation: fadeUp 0.2s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     .modal-card h2 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
     .modal-card > p { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
-    .modal-close {
-      position: absolute; top: 14px; right: 16px;
-      font-size: 18px; cursor: pointer; color: #aaa;
-      background: none; border: none; line-height: 1;
-    }
-    .modal-close:hover { color: #333; }
+    .modal-close { position: absolute; top: 14px; right: 16px; font-size: 18px;
+                   cursor: pointer; color: #aaa; background: none; border: none; line-height: 1; }
 
-    /* ════════════════════════════════
-       SHELL ADMIN / SUPERADMIN
-    ════════════════════════════════ */
+    /* ════════ SHELL ADMIN ════════ */
     #vista-admin { display: none; flex-direction: column; min-height: 100vh; }
     #vista-admin.active { display: flex; }
-
-    .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 1.5rem; height: 52px; background: #fff;
-      border-bottom: 1px solid #e0ddd5; position: sticky; top: 0; z-index: 10;
-    }
-    .topbar-brand { font-size: 15px; font-weight: 500; }
+    .topbar { display: flex; align-items: center; justify-content: space-between;
+              padding: 0 1.5rem; height: 52px; background: #1a1a1a;
+              border-bottom: 3px solid #F5A623; position: sticky; top: 0; z-index: 10; }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; }
+    .topbar-logo { height: 30px; }
     .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .user-chip { font-size: 13px; color: #666; }
-
+    .user-chip { font-size: 13px; color: #ccc; }
     .main { display: flex; flex: 1; }
-    .sidebar {
-      width: 200px; background: #fff; border-right: 1px solid #e0ddd5;
-      padding: 1rem 0; flex-shrink: 0;
-    }
-    .nav-item {
-      display: flex; align-items: center; gap: 8px; padding: 9px 1.25rem;
-      font-size: 14px; color: #666; cursor: pointer;
-      border-left: 2px solid transparent; transition: all 0.15s; user-select: none;
-    }
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #e0ddd5; padding: 1rem 0; flex-shrink: 0; }
+    .nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 1.25rem;
+                font-size: 14px; color: #666; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; }
     .nav-item:hover { background: #f5f5f3; color: #1a1a1a; }
-    .nav-item.active { color: #1a1a1a; background: #f5f5f3;
-                       border-left-color: #1a1a1a; font-weight: 500; }
+    .nav-item.active { color: #1a1a1a; background: #fffbf2; border-left-color: #F5A623; font-weight: 500; }
     .nav-icon { width: 18px; text-align: center; font-size: 15px; }
-
     .content { flex: 1; padding: 2rem; overflow-y: auto; }
     .page { display: none; }
     .page.active { display: block; }
     .page-title { font-size: 18px; font-weight: 500; margin-bottom: 1.5rem; }
 
-    /* Stats */
     .stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin-bottom: 1.5rem; }
     .stat { background: #fff; border: 1px solid #e0ddd5; border-radius: 12px; padding: 1rem 1.25rem; }
     .stat-num   { font-size: 28px; font-weight: 500; }
     .stat-label { font-size: 12px; color: #888; margin-top: 2px; }
 
-    /* Filtros */
     .toolbar { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
-    .filter-btn {
-      padding: 5px 12px; font-size: 12px; border: 1px solid #d0cdc5;
-      border-radius: 99px; cursor: pointer; background: #fff;
-      color: #888; font-family: inherit; transition: all 0.15s;
-    }
+    .filter-btn { padding: 5px 12px; font-size: 12px; border: 1px solid #d0cdc5;
+                  border-radius: 99px; cursor: pointer; background: #fff;
+                  color: #888; font-family: inherit; transition: all 0.15s; }
     .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
 
-    /* Tarjetas solicitud */
-    .sol-card {
-      background: #fff; border: 1px solid #e0ddd5;
-      border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 10px;
-    }
+    .sol-card { background: #fff; border: 1px solid #e0ddd5; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 10px; }
     .sol-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .sol-title  { font-size: 14px; font-weight: 500; }
     .sol-meta   { font-size: 12px; color: #888; margin-top: 3px; }
-    .sol-desc   { font-size: 13px; color: #555; margin-top: 10px;
-                  border-top: 1px solid #f0ede5; padding-top: 8px; }
+    .sol-desc   { font-size: 13px; color: #555; margin-top: 10px; border-top: 1px solid #f0ede5; padding-top: 8px; }
     .sol-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-    .sol-select {
-      font-size: 12px; padding: 4px 8px; border-radius: 6px;
-      border: 1px solid #d0cdc5; background: #fff; color: #1a1a1a; font-family: inherit;
-    }
+    .sol-select { font-size: 12px; padding: 4px 8px; border-radius: 6px;
+                  border: 1px solid #d0cdc5; background: #fff; color: #1a1a1a; font-family: inherit; }
     .badge { display: inline-block; font-size: 11px; padding: 2px 9px; border-radius: 99px; font-weight: 500; }
     .badge.pendiente  { background: #faeeda; color: #854f0b; }
     .badge.en-proceso { background: #e6f1fb; color: #185fa5; }
     .badge.resuelto   { background: #eaf3de; color: #3b6d11; }
     .badge.super { background: #EEEDFE; color: #534AB7; }
     .badge.admin { background: #E6F1FB; color: #185FA5; }
-    .assigned-tag {
-      font-size: 11px; color: #185fa5; background: #e6f1fb;
-      padding: 2px 8px; border-radius: 99px; white-space: nowrap;
-    }
-    .no-assigned { font-size: 11px; color: #aaa; }
+    .assigned-tag  { font-size: 11px; color: #185fa5; background: #e6f1fb; padding: 2px 8px; border-radius: 99px; }
+    .no-assigned   { font-size: 11px; color: #aaa; }
     .empty { text-align: center; padding: 3rem 1rem; color: #aaa; font-size: 14px; }
 
-    /* Tabla usuarios */
     .user-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .user-table th { text-align: left; font-size: 12px; color: #888; font-weight: 500;
-                     padding: 8px 12px; border-bottom: 1px solid #e0ddd5; }
+    .user-table th { text-align: left; font-size: 12px; color: #888; font-weight: 500; padding: 8px 12px; border-bottom: 1px solid #e0ddd5; }
     .user-table td { padding: 10px 12px; border-bottom: 1px solid #f0ede5; vertical-align: middle; }
     .user-table tr:last-child td { border-bottom: none; }
-    .add-user-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; align-items: end; }
+    .add-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; align-items: end; }
 
-    /* Config WA */
     .config-box { background: #f5f5f3; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
     .config-box h3 { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
-    .step { display: flex; gap: 10px; margin-bottom: 10px; font-size: 13px;
-            color: #555; align-items: flex-start; }
+    .step { display: flex; gap: 10px; margin-bottom: 10px; font-size: 13px; color: #555; align-items: flex-start; }
     .step-num { min-width: 22px; height: 22px; border-radius: 50%; background: #fff;
                 border: 1px solid #d0cdc5; display: flex; align-items: center;
                 justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
-    code { background: #fff; border: 1px solid #d0cdc5; padding: 1px 6px;
-           border-radius: 4px; font-family: monospace; font-size: 12px; }
+    code { background: #fff; border: 1px solid #d0cdc5; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; }
     hr.div { border: none; border-top: 1px solid #e0ddd5; margin: 1.5rem 0; }
     a { color: #185fa5; }
-
-    @media(max-width:580px) {
-      .sidebar { display: none; }
-      .content { padding: 1rem; }
-      .add-user-row { grid-template-columns: 1fr 1fr; }
-    }
+    @media(max-width:580px){ .sidebar{display:none} .content{padding:1rem} .add-row{grid-template-columns:1fr 1fr} .two-col{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════════
-     VISTA PÚBLICA
-══════════════════════════════════════════════════════════ -->
+<!-- PÚBLICA -->
 <div id="vista-publica">
-  <div class="pub-hero">
-    <h1>¿En qué te podemos ayudar?</h1>
-    <p>Envía tu solicitud y te responderemos a la brevedad.</p>
-    <!-- Trigger oculto: 3 clics en la esquina para abrir login -->
+    <div class="pub-hero">
+    <div class="hero-brand">
+      <img src="data:image/png;base64,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" alt="DSG" class="hero-icon">
+      <div class="hero-text">
+        <span class="hero-title">DESIGN</span>
+        <span class="hero-sub">Logistica y Servicios</span>
+      </div>
+    </div>
+    <div class="hero-bar"></div>
     <div class="secret-trigger" id="secret-trigger" onclick="secretClick()"></div>
   </div>
-
   <div class="pub-body">
     <div class="pub-card">
-      <!-- Formulario -->
       <div id="form-publico">
-        <h2>Nueva solicitud</h2>
-        <p>No necesitas registrarte. Solo completa el formulario.</p>
         <div id="alert-pub"></div>
-        <div class="field">
-          <label>Tu nombre</label>
-          <input type="text" id="pub-nombre" placeholder="Ej: María González">
+        <div class="two-col">
+          <div class="field">
+            <label>Nombre <span class="req">*</span></label>
+            <input type="text" id="pub-nombre" placeholder="Tu nombre">
+            <div class="err-msg" id="err-nombre">Ingresa tu nombre</div>
+          </div>
+          <div class="field">
+            <label>Apellido <span class="req">*</span></label>
+            <input type="text" id="pub-apellido" placeholder="Tu apellido">
+            <div class="err-msg" id="err-apellido">Ingresa tu apellido</div>
+          </div>
         </div>
         <div class="field">
-          <label>Tipo de solicitud</label>
+          <label>Tipo de solicitud <span class="req">*</span></label>
           <select id="pub-tipo">
-            <option value="">Selecciona...</option>
+            <option value="">Selecciona una opción...</option>
             <option>Soporte técnico</option>
             <option>Materiales / insumos</option>
-            <option>Permiso / Movilizacion</option>
-            <option>Consultar Orden de compra</option>
+            <option>Permiso de Bajada</option>
+            <option>Solicitud única</option>
             <option>Otro</option>
           </select>
+          <div class="err-msg" id="err-tipo">Selecciona un tipo de solicitud</div>
         </div>
         <div class="field">
-          <label>Descripción</label>
+          <label>Descripción <span class="req">*</span></label>
           <textarea id="pub-desc" placeholder="Describe lo que necesitas..."></textarea>
+          <div class="err-msg" id="err-desc">Ingresa una descripción</div>
         </div>
         <div class="field">
           <label>Prioridad</label>
@@ -256,39 +203,31 @@
             <option value="Urgente">Urgente</option>
           </select>
         </div>
-        <div class="btn-row">
-          <button class="btn primary" style="width:100%" onclick="enviarPublica()">Enviar solicitud →</button>
+        <div class="btn-row" style="margin-top:1.5rem">
+          <button class="btn primary" style="width:100%;padding:12px" onclick="enviarPublica()">Enviar solicitud →</button>
         </div>
       </div>
-
-      <!-- Éxito -->
       <div class="success-state" id="exito-pub">
         <div class="check">✅</div>
         <h3>¡Solicitud enviada!</h3>
-        <p>Recibimos tu solicitud y la estamos revisando. Gracias.</p>
+        <p>Recibimos tu solicitud y la estamos revisando.</p>
         <button class="btn primary" onclick="resetForm()">Enviar otra solicitud</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     MODAL LOGIN (oculto)
-══════════════════════════════════════════════════════════ -->
+<!-- MODAL LOGIN -->
 <div class="modal-overlay" id="modal-login">
   <div class="modal-card">
     <button class="modal-close" onclick="cerrarModal()">✕</button>
     <h2>Acceso interno</h2>
     <p>Solo para administradores del sistema.</p>
     <div id="alert-modal"></div>
-    <div class="field">
-      <label>Usuario</label>
-      <input type="text" id="m-user" placeholder="usuario" autocomplete="username">
-    </div>
-    <div class="field">
-      <label>Contraseña</label>
-      <input type="password" id="m-pass" placeholder="••••••••" autocomplete="current-password">
-    </div>
+    <div class="field"><label>Usuario</label>
+      <input type="text" id="m-user" placeholder="usuario" autocomplete="username"></div>
+    <div class="field"><label>Contraseña</label>
+      <input type="password" id="m-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <div class="btn-row" style="margin-top:1.25rem">
       <button class="btn" onclick="cerrarModal()">Cancelar</button>
       <button class="btn primary" onclick="iniciarSesion()">Entrar</button>
@@ -296,23 +235,23 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     VISTA ADMIN / SUPERADMIN
-══════════════════════════════════════════════════════════ -->
+<!-- SHELL ADMIN -->
 <div id="vista-admin">
   <div class="topbar">
-    <div class="topbar-brand">Sistema de Solicitudes</div>
+    <div class="topbar-brand">
+      <img src="data:image/png;base64,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" alt="DSG" style="height:34px;border-radius:4px;">
+      <span style="color:#fff;font-size:15px;font-weight:600;letter-spacing:0.5px">Design Logistica</span>
+    </div>
     <div class="topbar-right">
       <span class="user-chip" id="topbar-user"></span>
       <span class="badge" id="topbar-role"></span>
-      <button class="btn sm" onclick="cerrarSesion()">Salir</button>
+      <button class="btn sm" style="background:#fff;border-color:#555;color:#1a1a1a" onclick="cerrarSesion()">Salir</button>
     </div>
   </div>
   <div class="main">
     <div class="sidebar" id="sidebar"></div>
     <div class="content">
 
-      <!-- SUPERADMIN: Dashboard -->
       <div class="page" id="page-dashboard">
         <div class="page-title">Dashboard</div>
         <div class="stats" id="stats-dash"></div>
@@ -325,19 +264,15 @@
         <div id="lista-dash"></div>
       </div>
 
-      <!-- SUPERADMIN: Usuarios -->
       <div class="page" id="page-usuarios">
         <div class="page-title">Gestión de usuarios</div>
         <div class="config-box">
           <h3>Agregar usuario</h3>
-          <div class="add-user-row">
+          <div class="add-row">
             <div class="field" style="margin:0"><label>Usuario</label><input type="text" id="nu-user" placeholder="nombre"></div>
             <div class="field" style="margin:0"><label>Contraseña</label><input type="password" id="nu-pass" placeholder="••••••"></div>
             <div class="field" style="margin:0"><label>Rol</label>
-              <select id="nu-rol">
-                <option value="admin">Admin</option>
-                <option value="superadmin">Superadmin</option>
-              </select></div>
+              <select id="nu-rol"><option value="admin">Admin</option><option value="superadmin">Superadmin</option></select></div>
             <button class="btn primary" style="align-self:end" onclick="agregarUsuario()">Agregar</button>
           </div>
           <div id="alert-usr" style="margin-top:0.75rem"></div>
@@ -348,9 +283,8 @@
         </table>
       </div>
 
-      <!-- ADMIN: Mis asignaciones -->
       <div class="page" id="page-asignadas">
-        <div class="page-title">Solicitudes asignadas a mí</div>
+        <div class="page-title">Mis asignaciones</div>
         <div class="toolbar" id="tb-asig">
           <button class="filter-btn active" onclick="filtrarAsig('todos',this)">Todas</button>
           <button class="filter-btn" onclick="filtrarAsig('Pendiente',this)">Pendientes</button>
@@ -360,23 +294,18 @@
         <div id="lista-asig"></div>
       </div>
 
-      <!-- SUPERADMIN: WhatsApp -->
       <div class="page" id="page-wa">
         <div class="page-title">Configurar WhatsApp</div>
         <div class="config-box">
           <h3>Cómo activar CallMeBot (solo una vez)</h3>
-          <div class="step"><div class="step-num">1</div>
-            <span>Agrega <code>+34 644 59 21 68</code> a tus contactos de WhatsApp</span></div>
-          <div class="step"><div class="step-num">2</div>
-            <span>Mándale este mensaje exacto: <code>I allow callmebot to send me messages</code></span></div>
-          <div class="step"><div class="step-num">3</div>
-            <span>El bot te responde con tu <strong>API key</strong></span></div>
-          <div class="step"><div class="step-num">4</div>
-            <span>Pega tu número y API key abajo y guarda</span></div>
+          <div class="step"><div class="step-num">1</div><span>Agrega <code>+34 644 59 21 68</code> a tus contactos de WhatsApp</span></div>
+          <div class="step"><div class="step-num">2</div><span>Mándale: <code>I allow callmebot to send me messages</code></span></div>
+          <div class="step"><div class="step-num">3</div><span>El bot te responde con tu <strong>API key</strong></span></div>
+          <div class="step"><div class="step-num">4</div><span>Ingresa tu número y API key abajo</span></div>
         </div>
         <div class="field"><label>Número (con código de país, sin + ni espacios)</label>
           <input type="text" id="wa-phone" placeholder="56912345678"></div>
-        <div class="field"><label>API Key de CallMeBot</label>
+        <div class="field"><label>API Key</label>
           <input type="text" id="wa-apikey" placeholder="123456"></div>
         <div id="alert-wa"></div>
         <div class="btn-row">
@@ -384,7 +313,8 @@
           <button class="btn primary" onclick="guardarWA()">Guardar</button>
         </div>
         <hr class="div">
-        <p style="font-size:12px;color:#aaa">Servicio gratuito · <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank">callmebot.com</a></p>
+        <p style="font-size:12px;color:#aaa">Servicio gratuito ·
+          <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank">callmebot.com</a></p>
       </div>
 
     </div>
@@ -392,247 +322,178 @@
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════
-//  STORAGE
-// ════════════════════════════════════════════════════════════
-const S = {
-  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
-  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
-};
-
-function getUsuarios()    { return S.get('usuarios')    || []; }
-function getSolicitudes() { return S.get('solicitudes') || []; }
-function getWA()          { return S.get('wa_config')   || {phone:'',apikey:''}; }
-
-function initUsuarios() {
-  if (!S.get('usuarios')) {
-    S.set('usuarios', [
-      {id:1, username:'superadmin', password:'super123', rol:'superadmin'},
-      {id:2, username:'admin1',     password:'admin123', rol:'admin'},
-      {id:3, username:'admin2',     password:'admin456', rol:'admin'},
-    ]);
-  }
+async function api(url,method='GET',body=null){
+  const opts={method,headers:{'Content-Type':'application/json'},credentials:'same-origin'};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts); return r.json();
 }
 
-let sesion = null;
-let filtDash = 'todos';
-let filtAsig = 'todos';
+let sesion=null, todasSols=[], solsAsig=[], adminsCache=null;
+let filtDash='todos', filtAsig='todos';
 
-// ════════════════════════════════════════════════════════════
-//  TRIGGER OCULTO (3 clics en la esquina)
-// ════════════════════════════════════════════════════════════
-let secretCount = 0, secretTimer = null;
-function secretClick() {
-  secretCount++;
-  clearTimeout(secretTimer);
-  secretTimer = setTimeout(() => secretCount = 0, 1500);
-  if (secretCount >= 3) {
-    secretCount = 0;
-    abrirModal();
-  }
+// ── Trigger oculto ──
+let sc=0,st=null;
+function secretClick(){
+  sc++; clearTimeout(st);
+  st=setTimeout(()=>sc=0,1500);
+  if(sc>=3){sc=0;abrirModal();}
 }
-
-function abrirModal() {
-  document.getElementById('modal-login').classList.add('active');
-  document.getElementById('m-user').focus();
-}
-function cerrarModal() {
+function abrirModal(){ document.getElementById('modal-login').classList.add('active'); document.getElementById('m-user').focus(); }
+function cerrarModal(){
   document.getElementById('modal-login').classList.remove('active');
-  document.getElementById('alert-modal').innerHTML = '';
-  document.getElementById('m-user').value = '';
-  document.getElementById('m-pass').value = '';
+  document.getElementById('alert-modal').innerHTML='';
+  document.getElementById('m-user').value='';
+  document.getElementById('m-pass').value='';
 }
-document.getElementById('m-pass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') iniciarSesion();
-});
+document.getElementById('m-pass').addEventListener('keydown',e=>{if(e.key==='Enter')iniciarSesion();});
 
-// ════════════════════════════════════════════════════════════
-//  AUTH
-// ════════════════════════════════════════════════════════════
-function iniciarSesion() {
-  const username = document.getElementById('m-user').value.trim();
-  const password = document.getElementById('m-pass').value;
-  const box      = document.getElementById('alert-modal');
-  const u = getUsuarios().find(u => u.username === username && u.password === password);
-  if (!u) {
-    box.innerHTML = '<div class="alert error">Usuario o contraseña incorrectos.</div>';
-    return;
-  }
-  sesion = u;
-  cerrarModal();
-  document.getElementById('vista-publica').style.display  = 'none';
+// ── Auth ──
+async function iniciarSesion(){
+  const username=document.getElementById('m-user').value.trim();
+  const password=document.getElementById('m-pass').value;
+  const box=document.getElementById('alert-modal');
+  const d=await api('/api/login','POST',{username,password});
+  if(!d.ok){box.innerHTML=`<div class="alert error">${d.error}</div>`;return;}
+  sesion=d.user; cerrarModal();
+  document.getElementById('vista-publica').style.display='none';
   document.getElementById('vista-admin').classList.add('active');
   cargarAdmin();
 }
-
-function cerrarSesion() {
-  sesion = null;
+async function cerrarSesion(){
+  await api('/api/logout','POST');
+  sesion=null; todasSols=[]; solsAsig=[]; adminsCache=null;
   document.getElementById('vista-admin').classList.remove('active');
-  document.getElementById('vista-publica').style.display = 'flex';
-  // limpiar filtros
-  filtDash = 'todos'; filtAsig = 'todos';
+  document.getElementById('vista-publica').style.display='flex';
 }
 
-// ════════════════════════════════════════════════════════════
-//  SHELL ADMIN
-// ════════════════════════════════════════════════════════════
-function cargarAdmin() {
-  const rb = document.getElementById('topbar-role');
-  document.getElementById('topbar-user').textContent = sesion.username;
-  rb.textContent = sesion.rol;
-  rb.className = `badge ${sesion.rol === 'superadmin' ? 'super' : 'admin'}`;
-
-  const nav = sesion.rol === 'superadmin'
-    ? [{id:'dashboard',icon:'📊',label:'Dashboard'},
-       {id:'usuarios', icon:'👥',label:'Usuarios'},
-       {id:'wa',       icon:'💬',label:'WhatsApp'}]
-    : [{id:'asignadas',icon:'📬',label:'Mis asignaciones'}];
-
-  const sb = document.getElementById('sidebar');
-  sb.innerHTML = nav.map((n,i) =>
-    `<div class="nav-item ${i===0?'active':''}" onclick="irA('${n.id}',this)">
-       <span class="nav-icon">${n.icon}</span>${n.label}
-     </div>`).join('');
-
-  // restaurar WA
-  const wa = getWA();
-  const wp = document.getElementById('wa-phone');
-  const wk = document.getElementById('wa-apikey');
-  if (wp) wp.value = wa.phone   || '';
-  if (wk) wk.value = wa.apikey || '';
-
-  irA(nav[0].id, sb.querySelector('.nav-item'));
+// ── Shell ──
+async function cargarAdmin(){
+  const rb=document.getElementById('topbar-role');
+  document.getElementById('topbar-user').textContent=sesion.username;
+  rb.textContent=sesion.rol; rb.className=`badge ${sesion.rol==='superadmin'?'super':'admin'}`;
+  const nav=sesion.rol==='superadmin'
+    ?[{id:'dashboard',icon:'📊',label:'Dashboard'},{id:'usuarios',icon:'👥',label:'Usuarios'},{id:'wa',icon:'💬',label:'WhatsApp'}]
+    :[{id:'asignadas',icon:'📬',label:'Mis asignaciones'}];
+  const sb=document.getElementById('sidebar');
+  sb.innerHTML=nav.map((n,i)=>`<div class="nav-item ${i===0?'active':''}" onclick="irA('${n.id}',this)"><span class="nav-icon">${n.icon}</span>${n.label}</div>`).join('');
+  if(sesion.rol==='superadmin'){const wa=await api('/api/wa/config');document.getElementById('wa-phone').value=wa.phone||'';document.getElementById('wa-apikey').value=wa.apikey||'';}
+  irA(nav[0].id,sb.querySelector('.nav-item'));
+}
+function irA(pageId,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('page-'+pageId)?.classList.add('active');
+  if(pageId==='dashboard') renderDashboard();
+  if(pageId==='usuarios')  renderUsuarios();
+  if(pageId==='asignadas') renderAsignadas();
 }
 
-function irA(pageId, el) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.getElementById('page-' + pageId)?.classList.add('active');
-  if (pageId === 'dashboard') renderDashboard();
-  if (pageId === 'usuarios')  renderUsuarios();
-  if (pageId === 'asignadas') renderAsignadas();
+// ── Validación ──
+function validarCampo(id,errId,condicion){
+  const el=document.getElementById(id);
+  const err=document.getElementById(errId);
+  if(condicion){el.classList.remove('error');err.classList.remove('show');return true;}
+  el.classList.add('error');err.classList.add('show');return false;
 }
 
-// ════════════════════════════════════════════════════════════
-//  FORMULARIO PÚBLICO
-// ════════════════════════════════════════════════════════════
-async function enviarPublica() {
-  const nombre = document.getElementById('pub-nombre').value.trim();
-  const tipo   = document.getElementById('pub-tipo').value;
-  const desc   = document.getElementById('pub-desc').value.trim();
-  const prio   = document.getElementById('pub-prio').value;
-  const box    = document.getElementById('alert-pub');
+// ── Formulario público ──
+async function enviarPublica(){
+  const nombre=document.getElementById('pub-nombre').value.trim();
+  const apellido=document.getElementById('pub-apellido').value.trim();
+  const tipo=document.getElementById('pub-tipo').value;
+  const desc=document.getElementById('pub-desc').value.trim();
+  const prio=document.getElementById('pub-prio').value;
+  const box=document.getElementById('alert-pub');
 
-  if (!nombre || !tipo || !desc) {
-    box.innerHTML = '<div class="alert error">Por favor completa todos los campos.</div>';
-    return;
+  const v1=validarCampo('pub-nombre','err-nombre',nombre.length>0);
+  const v2=validarCampo('pub-apellido','err-apellido',apellido.length>0);
+  const v3=validarCampo('pub-tipo','err-tipo',tipo.length>0);
+  const v4=validarCampo('pub-desc','err-desc',desc.length>0);
+  if(!v1||!v2||!v3||!v4) return;
+
+  const d=await api('/api/solicitudes','POST',{nombre:`${nombre} ${apellido}`,tipo,descripcion:desc,prioridad:prio});
+  if(d.ok){
+    document.getElementById('form-publico').style.display='none';
+    document.getElementById('exito-pub').style.display='block';
+    box.innerHTML='';
+  } else {
+    box.innerHTML='<div class="alert error">Error al enviar. Intenta de nuevo.</div>';
   }
-
-  const sols = getSolicitudes();
-  const sol = {
-    id:          Date.now(),
-    nombre, tipo, descripcion: desc, prioridad: prio,
-    solicitante: nombre,
-    asignadoA:   null,
-    estado:      'Pendiente',
-    fecha:       new Date().toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'})
-  };
-  sols.unshift(sol);
-  S.set('solicitudes', sols);
-
-  // notificar WA
-  await notificarWA(sol);
-
-  // mostrar éxito
-  document.getElementById('form-publico').style.display = 'none';
-  document.getElementById('exito-pub').style.display    = 'block';
-  box.innerHTML = '';
 }
 
-function resetForm() {
-  document.getElementById('form-publico').style.display = 'block';
-  document.getElementById('exito-pub').style.display    = 'none';
-  document.getElementById('pub-nombre').value = '';
-  document.getElementById('pub-tipo').value   = '';
-  document.getElementById('pub-desc').value   = '';
-  document.getElementById('pub-prio').value   = 'Normal';
+function resetForm(){
+  document.getElementById('form-publico').style.display='block';
+  document.getElementById('exito-pub').style.display='none';
+  ['pub-nombre','pub-apellido','pub-desc'].forEach(id=>{
+    document.getElementById(id).value='';
+    document.getElementById(id).classList.remove('error');
+  });
+  document.getElementById('pub-tipo').value='';
+  document.getElementById('pub-tipo').classList.remove('error');
+  document.getElementById('pub-prio').value='Normal';
+  ['err-nombre','err-apellido','err-tipo','err-desc'].forEach(id=>document.getElementById(id).classList.remove('show'));
 }
 
-// ════════════════════════════════════════════════════════════
-//  DASHBOARD (SUPERADMIN)
-// ════════════════════════════════════════════════════════════
-function filtrarDash(f, btn) {
-  filtDash = f;
-  document.querySelectorAll('#tb-dash .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDashboard();
+// ── Dashboard ──
+function filtrarDash(f,btn){
+  filtDash=f;
+  document.querySelectorAll('#tb-dash .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderListaDash();
 }
-
-function renderDashboard() {
-  const sols = getSolicitudes();
-  document.getElementById('stats-dash').innerHTML = `
+async function renderDashboard(){
+  const sols=await api('/api/solicitudes');
+  todasSols=sols;
+  document.getElementById('stats-dash').innerHTML=`
     <div class="stat"><div class="stat-num">${sols.length}</div><div class="stat-label">Total</div></div>
     <div class="stat"><div class="stat-num">${sols.filter(s=>s.estado==='Pendiente').length}</div><div class="stat-label">Pendientes</div></div>
     <div class="stat"><div class="stat-num">${sols.filter(s=>s.estado==='En proceso').length}</div><div class="stat-label">En proceso</div></div>
     <div class="stat"><div class="stat-num">${sols.filter(s=>s.estado==='Resuelto').length}</div><div class="stat-label">Resueltas</div></div>`;
-
-  let items = filtDash === 'todos' ? sols : sols.filter(s => s.estado === filtDash);
-  const cont = document.getElementById('lista-dash');
-  if (!items.length) { cont.innerHTML = '<div class="empty">No hay solicitudes.</div>'; return; }
-  cont.innerHTML = items.map(s => tarjeta(s, 'superadmin')).join('');
+  renderListaDash();
+}
+function renderListaDash(){
+  const items=filtDash==='todos'?todasSols:todasSols.filter(s=>s.estado===filtDash);
+  const cont=document.getElementById('lista-dash');
+  if(!items.length){cont.innerHTML='<div class="empty">No hay solicitudes.</div>';return;}
+  cont.innerHTML=items.map(s=>tarjeta(s,'superadmin')).join('');
 }
 
-// ════════════════════════════════════════════════════════════
-//  ASIGNADAS (ADMIN)
-// ════════════════════════════════════════════════════════════
-function filtrarAsig(f, btn) {
-  filtAsig = f;
-  document.querySelectorAll('#tb-asig .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderAsignadas();
+// ── Asignadas ──
+function filtrarAsig(f,btn){
+  filtAsig=f;
+  document.querySelectorAll('#tb-asig .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderListaAsig();
+}
+async function renderAsignadas(){ solsAsig=await api('/api/solicitudes'); renderListaAsig(); }
+function renderListaAsig(){
+  let items=filtAsig==='todos'?solsAsig:solsAsig.filter(s=>s.estado===filtAsig);
+  const cont=document.getElementById('lista-asig');
+  if(!items.length){cont.innerHTML='<div class="empty">No tienes asignaciones.</div>';return;}
+  cont.innerHTML=items.map(s=>tarjeta(s,'admin')).join('');
 }
 
-function renderAsignadas() {
-  let items = getSolicitudes().filter(s => s.asignadoA === sesion.username);
-  if (filtAsig !== 'todos') items = items.filter(s => s.estado === filtAsig);
-  const cont = document.getElementById('lista-asig');
-  if (!items.length) { cont.innerHTML = '<div class="empty">No tienes solicitudes asignadas.</div>'; return; }
-  cont.innerHTML = items.map(s => tarjeta(s, 'admin')).join('');
-}
-
-// ════════════════════════════════════════════════════════════
-//  TARJETA SOLICITUD
-// ════════════════════════════════════════════════════════════
-function tarjeta(s, rol) {
-  const cls = s.estado === 'Pendiente' ? 'pendiente' : s.estado === 'En proceso' ? 'en-proceso' : 'resuelto';
-  const admins = getUsuarios().filter(u => u.rol === 'admin');
-  const asigTag = s.asignadoA
-    ? `<span class="assigned-tag">→ ${s.asignadoA}</span>`
-    : `<span class="no-assigned">Sin asignar</span>`;
-
-  let actions = `<span class="badge ${cls}">${s.estado}</span>`;
-
-  // estado editable para ambos roles
-  actions += `<select class="sol-select" onchange="cambiarEstado(${s.id},this.value)">
-    <option ${s.estado==='Pendiente' ?'selected':''}>Pendiente</option>
-    <option ${s.estado==='En proceso'?'selected':''}>En proceso</option>
-    <option ${s.estado==='Resuelto'  ?'selected':''}>Resuelto</option>
-  </select>`;
-
-  // asignar solo superadmin
-  if (rol === 'superadmin') {
-    actions += `<select class="sol-select" onchange="asignar(${s.id},this.value)">
+// ── Tarjeta ──
+function tarjeta(s,rol){
+  const cls=s.estado==='Pendiente'?'pendiente':s.estado==='En proceso'?'en-proceso':'resuelto';
+  const asigTag=s.asignadoA?`<span class="assigned-tag">→ ${s.asignadoA}</span>`:`<span class="no-assigned">Sin asignar</span>`;
+  let actions=`<span class="badge ${cls}">${s.estado}</span>
+    <select class="sol-select" onchange="cambiarEstado(${s.id},this.value)">
+      <option ${s.estado==='Pendiente'?'selected':''}>Pendiente</option>
+      <option ${s.estado==='En proceso'?'selected':''}>En proceso</option>
+      <option ${s.estado==='Resuelto'?'selected':''}>Resuelto</option>
+    </select>`;
+  if(rol==='superadmin'){
+    const admins=(adminsCache||[]).filter(u=>u.rol==='admin');
+    actions+=`<select class="sol-select" onchange="asignar(${s.id},this.value)">
       <option value="">Sin asignar</option>
       ${admins.map(a=>`<option ${s.asignadoA===a.username?'selected':''}>${a.username}</option>`).join('')}
     </select>`;
   }
-
   return `<div class="sol-card">
     <div class="sol-header">
       <div>
-        <div class="sol-title">${s.tipo} <span style="font-weight:400;color:#888">— ${s.solicitante}</span></div>
-        <div class="sol-meta">${s.fecha} · Prioridad: ${s.prioridad} · ${asigTag}</div>
+        <div class="sol-title">${s.tipo} <span style="font-weight:400;color:#888">— ${s.nombre||s.solicitante}</span></div>
+        <div class="sol-meta">${s.fecha} · ${s.prioridad} · ${asigTag}</div>
       </div>
       <div class="sol-actions">${actions}</div>
     </div>
@@ -640,106 +501,69 @@ function tarjeta(s, rol) {
   </div>`;
 }
 
-function cambiarEstado(id, estado) {
-  const sols = getSolicitudes();
-  const s = sols.find(x => x.id === id);
-  if (s) { s.estado = estado; S.set('solicitudes', sols); }
-  if (sesion?.rol === 'superadmin') renderDashboard();
-  else renderAsignadas();
+async function cambiarEstado(id,estado){
+  await api(`/api/solicitudes/${id}/estado`,'PATCH',{estado});
+  const upd=arr=>arr.map(s=>s.id===id?{...s,estado}:s);
+  todasSols=upd(todasSols); solsAsig=upd(solsAsig);
+  if(sesion?.rol==='superadmin') renderListaDash(); else renderListaAsig();
+}
+async function asignar(id,admin){
+  await api(`/api/solicitudes/${id}/asignar`,'PATCH',{asignadoA:admin||null});
+  todasSols=todasSols.map(s=>s.id===id?{...s,asignadoA:admin||null}:s);
+  renderListaDash();
 }
 
-function asignar(id, admin) {
-  const sols = getSolicitudes();
-  const s = sols.find(x => x.id === id);
-  if (s) { s.asignadoA = admin || null; S.set('solicitudes', sols); }
-  renderDashboard();
+// ── Usuarios ──
+async function renderUsuarios(){
+  adminsCache=null;
+  const users=await api('/api/usuarios');
+  adminsCache=users;
+  const tbody=document.getElementById('tbody-usr');
+  tbody.innerHTML=users.map(u=>`<tr>
+    <td>${u.username}</td>
+    <td><span class="badge ${u.rol==='superadmin'?'super':'admin'}">${u.rol}</span></td>
+    <td>${u.rol==='admin'?todasSols.filter(s=>s.asignadoA===u.username).length:'—'}</td>
+    <td>${u.username==='superadmin'?'':`<button class="btn sm danger" onclick="eliminarUsuario(${u.id})">Eliminar</button>`}</td>
+  </tr>`).join('');
+}
+async function agregarUsuario(){
+  const username=document.getElementById('nu-user').value.trim();
+  const password=document.getElementById('nu-pass').value.trim();
+  const rol=document.getElementById('nu-rol').value;
+  const box=document.getElementById('alert-usr');
+  if(!username||!password){box.innerHTML='<div class="alert error">Completa usuario y contraseña.</div>';return;}
+  const d=await api('/api/usuarios','POST',{username,password,rol});
+  if(d.ok){document.getElementById('nu-user').value='';document.getElementById('nu-pass').value='';
+    box.innerHTML='<div class="alert success">✓ Usuario creado.</div>';setTimeout(()=>box.innerHTML='',3000);renderUsuarios();}
+  else box.innerHTML=`<div class="alert error">${d.error}</div>`;
+}
+async function eliminarUsuario(id){
+  if(!confirm('¿Eliminar este usuario?'))return;
+  await api(`/api/usuarios/${id}`,'DELETE'); renderUsuarios();
 }
 
-// ════════════════════════════════════════════════════════════
-//  USUARIOS (SUPERADMIN)
-// ════════════════════════════════════════════════════════════
-function renderUsuarios() {
-  const tbody = document.getElementById('tbody-usr');
-  const sols  = getSolicitudes();
-  tbody.innerHTML = getUsuarios().map(u => {
-    const asig = sols.filter(s => s.asignadoA === u.username).length;
-    const esProtegido = u.username === 'superadmin';
-    return `<tr>
-      <td>${u.username}</td>
-      <td><span class="badge ${u.rol === 'superadmin' ? 'super' : 'admin'}">${u.rol}</span></td>
-      <td>${u.rol === 'admin' ? asig : '—'}</td>
-      <td>${esProtegido ? '' : `<button class="btn sm danger" onclick="eliminarUsuario(${u.id})">Eliminar</button>`}</td>
-    </tr>`;
-  }).join('');
+// ── WhatsApp ──
+async function probarWA(){
+  const phone=document.getElementById('wa-phone').value.trim();
+  const apikey=document.getElementById('wa-apikey').value.trim();
+  const box=document.getElementById('alert-wa');
+  if(!phone||!apikey){box.innerHTML='<div class="alert error">Ingresa número y API key.</div>';return;}
+  await api('/api/wa/config','POST',{phone,apikey});
+  box.innerHTML='<div class="alert info">Enviando...</div>';
+  const d=await api('/api/wa/test','POST');
+  box.innerHTML=d.ok?'<div class="alert success">✓ Enviado. Revisa tu WhatsApp.</div>':`<div class="alert error">Error: ${d.error||'no se pudo enviar'}</div>`;
+}
+async function guardarWA(){
+  await api('/api/wa/config','POST',{phone:document.getElementById('wa-phone').value.trim(),apikey:document.getElementById('wa-apikey').value.trim()});
+  document.getElementById('alert-wa').innerHTML='<div class="alert success">✓ Guardado.</div>';
+  setTimeout(()=>document.getElementById('alert-wa').innerHTML='',3000);
 }
 
-function agregarUsuario() {
-  const username = document.getElementById('nu-user').value.trim();
-  const password = document.getElementById('nu-pass').value.trim();
-  const rol      = document.getElementById('nu-rol').value;
-  const box      = document.getElementById('alert-usr');
-  if (!username || !password) {
-    box.innerHTML = '<div class="alert error">Completa usuario y contraseña.</div>'; return;
-  }
-  const usuarios = getUsuarios();
-  if (usuarios.find(u => u.username === username)) {
-    box.innerHTML = '<div class="alert error">Ese nombre ya existe.</div>'; return;
-  }
-  usuarios.push({id: Date.now(), username, password, rol});
-  S.set('usuarios', usuarios);
-  document.getElementById('nu-user').value = '';
-  document.getElementById('nu-pass').value = '';
-  box.innerHTML = '<div class="alert success">✓ Usuario creado.</div>';
-  setTimeout(() => box.innerHTML = '', 3000);
-  renderUsuarios();
-}
-
-function eliminarUsuario(id) {
-  if (!confirm('¿Eliminar este usuario?')) return;
-  S.set('usuarios', getUsuarios().filter(u => u.id !== id));
-  renderUsuarios();
-}
-
-// ════════════════════════════════════════════════════════════
-//  WHATSAPP
-// ════════════════════════════════════════════════════════════
-async function notificarWA(sol) {
-  const wa = getWA();
-  if (!wa.phone || !wa.apikey) return false;
-  const emoji = sol.prioridad === 'Urgente' ? '🔴' : sol.prioridad === 'Alta' ? '🟠' : '🟢';
-  const texto = `📋 Nueva solicitud\n👤 ${sol.nombre || sol.solicitante}\n📁 ${sol.tipo}\n${emoji} Prioridad: ${sol.prioridad}\n📝 ${sol.descripcion}\n🕐 ${sol.fecha}`;
-  const url = `https://api.callmebot.com/whatsapp.php?phone=${wa.phone}&text=${encodeURIComponent(texto)}&apikey=${wa.apikey}`;
-  try { await fetch(url, {mode:'no-cors'}); return true; } catch(e) { return false; }
-}
-
-async function probarWA() {
-  const phone  = document.getElementById('wa-phone').value.trim();
-  const apikey = document.getElementById('wa-apikey').value.trim();
-  const box    = document.getElementById('alert-wa');
-  if (!phone || !apikey) { box.innerHTML = '<div class="alert error">Ingresa número y API key.</div>'; return; }
-  box.innerHTML = '<div class="alert info">Enviando mensaje de prueba...</div>';
-  const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent('✅ Prueba exitosa desde tu sistema de solicitudes.')}&apikey=${apikey}`;
-  try {
-    await fetch(url, {mode:'no-cors'});
-    box.innerHTML = '<div class="alert success">✓ Enviado. Revisa tu WhatsApp.</div>';
-  } catch(e) {
-    box.innerHTML = '<div class="alert error">Error al conectar.</div>';
-  }
-}
-
-function guardarWA() {
-  S.set('wa_config', {
-    phone:  document.getElementById('wa-phone').value.trim(),
-    apikey: document.getElementById('wa-apikey').value.trim()
-  });
-  document.getElementById('alert-wa').innerHTML = '<div class="alert success">✓ Configuración guardada.</div>';
-  setTimeout(() => document.getElementById('alert-wa').innerHTML = '', 3000);
-}
-
-// ════════════════════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════════════════════
-initUsuarios();
+// ── Init ──
+(async()=>{
+  const d=await api('/api/me');
+  if(d.user){sesion=d.user;document.getElementById('vista-publica').style.display='none';document.getElementById('vista-admin').classList.add('active');cargarAdmin();}
+})();
 </script>
 </body>
 </html>

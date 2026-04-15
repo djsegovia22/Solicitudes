@@ -18,15 +18,21 @@
     "rol": "admin"
   },
   {
-    "id": 4,
-    "username": "usuario1",
-    "password": "e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446",
-    "rol": "usuario"
+    "id": 1776213365198,
+    "username": "rocio",
+    "password": "2131c65bf715f3f1af43a56f798b5c2722b69aa25b0471a86b8b71501e458d47",
+    "rol": "superadmin"
   },
   {
-    "id": 5,
-    "username": "usuario2",
-    "password": "c670f7b23c1bf997ec890e9d23ea7c016e12b243bdbd151f08baf5f0b86a7c5e",
-    "rol": "usuario"
+    "id": 1776213709216,
+    "username": "javier",
+    "password": "26ce13833bf9b1a34904d0b8ff10bc035178931c4ac6d8d02cc2274c6d20a09c",
+    "rol": "admin"
+  },
+  {
+    "id": 1776213718562,
+    "username": "krishna",
+    "password": "b06514d8bc65875cc670a226aa945c492c126ef2da71f226c3ed938aacb27f30",
+    "rol": "admin"
   }
 ]
