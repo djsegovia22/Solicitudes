@@ -1,12 +1,23 @@
 [
   {
+    "id": 1776281000443,
+    "nombre": "krishna palavecinos",
+    "tipo": "Permiso de Bajada",
+    "descripcion": "BAJADA A LAS 3",
+    "prioridad": "Normal",
+    "solicitante": "krishna palavecinos",
+    "asignadoA": "javier",
+    "estado": "Pendiente",
+    "fecha": "15/04/26 15:23"
+  },
+  {
     "id": 1776213033767,
     "nombre": "Felipe Ramirez",
     "tipo": "Soporte técnico",
     "descripcion": "Necesito la creacion de un correo",
     "prioridad": "Normal",
     "solicitante": "Felipe Ramirez",
-    "asignadoA": null,
+    "asignadoA": "krishna",
     "estado": "Pendiente",
     "fecha": "14/04/26 20:30"
   },

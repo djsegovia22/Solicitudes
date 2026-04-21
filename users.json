@@ -34,5 +34,11 @@
     "username": "krishna",
     "password": "b06514d8bc65875cc670a226aa945c492c126ef2da71f226c3ed938aacb27f30",
     "rol": "admin"
+  },
+  {
+    "id": 1776281070061,
+    "username": "javier1",
+    "password": "168e047b7600aace1a23503e131ccd571129743edbbcd99d9f1bae0666b68c3f",
+    "rol": "admin"
   }
 ]
